@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    ports:
+      - "12000:12000"
+    depends_on:
+      - mongodb
+    environment:
+      - NODE_ENV=production
+      - PORT=12000
+      - MONGO_URI_ATLAS=mongodb://mongodb:27017/artisan_management
+      - MONGO_URI_LOCAL=mongodb://mongodb:27017/artisan_management
+      - JWT_ACCESS_SECRET=roots_reach_jwt_access_secret_key_for_production
+      - JWT_REFRESH_SECRET=roots_reach_jwt_refresh_secret_key_for_production
+      - CLIENT_URL=http://localhost:12001
+      - SESSION_SECRET=roots_reach_session_secret_key_for_production
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - "12001:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

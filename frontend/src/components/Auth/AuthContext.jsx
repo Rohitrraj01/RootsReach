@@ -47,24 +47,14 @@ export const AuthProvider = ({ children }) => {
   // 🔑 Login Function
   const login = async (credentials) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-
-      const data = await response.json();
+      // Import here to avoid circular dependency
+      const { authAPI } = await import('../../services/api');
+      const data = await authAPI.login(credentials);
       
       // 📝 Store user data and token
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('userId', data.user.id);
+      localStorage.setItem('userId', data.user.id || data.user._id);
       
       setUser(data.user);
       setIsAuthenticated(true);
@@ -77,13 +67,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   // 🚪 Logout Function
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userId');
-    setUser(null);
-    setIsAuthenticated(false);
-    window.location.href = '/';
+  const logout = async () => {
+    try {
+      // Import here to avoid circular dependency
+      const { authAPI } = await import('../../services/api');
+      await authAPI.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Always clear local storage and state even if API call fails
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('userId');
+      setUser(null);
+      setIsAuthenticated(false);
+      navigate('/');
+    }
   };
 
   // 🛡️ Role Check Functions

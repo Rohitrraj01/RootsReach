@@ -4,8 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import './index.css';
 
-
-import { AuthProvider } from './components/dashboard/artisian-dashboard/context/AuthContext';  
+// Use the main AuthProvider from Auth folder
+import { AuthProvider } from './components/Auth/AuthContext';  
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -17,6 +17,7 @@ const materialRoutes = require('./routes/Material_route');
 const inventoryRoutes = require('./routes/Inventory_route');
 const backupRoutes = require('./routes/Backup_route');
 const devLogsRoutes = require('./routes/DevLogs_route');
+const aiRoutes = require('./routes/AI_route');
 
 // Import middleware
 const { generalLimit } = require('./middleware/rateLimiting');
@@ -149,6 +150,9 @@ app.use('/api/backups', backupRoutes);
 
 console.log('Defining dev logs routes...');
 app.use('/api/dev', devLogsRoutes);
+
+console.log('Defining AI routes...');
+app.use('/api/ai', aiRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
